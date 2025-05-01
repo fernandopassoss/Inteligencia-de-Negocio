@@ -1,4 +1,4 @@
-# 📊 Inteligência de Negócio e Visualização de Dados (CRT0416)
+# 📊 Inteligência de Negócio e Visualização de Dados 
 
 Bem-vindo(a) ao repositório da disciplina **Inteligência de Negócio e Visualização de Dados**, ofertada no semestre **2025.1** pelo curso de **Sistemas de Informação/Ciência da Computação** da **UFC - Campus Crateús**.
 

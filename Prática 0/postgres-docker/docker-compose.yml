@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  db:
+    build: .
+    container_name: postgres-container
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha_segura
+      POSTGRES_DB: meubanco
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+volumes:
+  postgres_data:

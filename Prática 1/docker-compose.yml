@@ -1,0 +1,39 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: postgres.dockerfile
+    container_name: postgres-container
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: senha_segura
+      POSTGRES_DB: meubanco
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - postgres-network
+
+  python:
+    build:
+      context: .
+      dockerfile: python.dockerfile
+    container_name: python-container
+    restart: always
+    ports:
+      - 5433:5433
+    volumes:
+      - shared_data:/usr/src/app/dados
+    networks:
+      - postgres-network
+  
+networks:
+  postgres-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  shared_data:
+    

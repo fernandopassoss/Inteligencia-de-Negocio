@@ -5,7 +5,7 @@ CREATE TABLE usuarios (
     data_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERTOS INTO usuarios (name, email) VALUES
+INSERT INTO usuarios (name, email) VALUES
 ('João Silva', 'joao@exemplo.com'),
 ('Maria Souza', 'maria@exemplo.com'),
 ('Carlos Pereira', 'carlos@exemplo.com');

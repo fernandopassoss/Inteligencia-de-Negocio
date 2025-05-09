@@ -28,7 +28,18 @@ services:
       - shared_data:/usr/src/app/dados
     networks:
       - postgres-network
-  
+
+  csv-generator:
+    build:
+      context: .
+      dockerfile: csv_generator.dockerfile
+    container_name: csv-generator
+    restart: "no"
+    volumes:
+      - shared_data:/usr/src/app/dados
+    networks:
+      - postgres-network
+
 networks:
   postgres-network:
     driver: bridge
@@ -36,4 +47,3 @@ networks:
 volumes:
   postgres_data:
   shared_data:
-    

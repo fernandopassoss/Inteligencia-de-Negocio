@@ -4,6 +4,6 @@ WORKDIR /app
 
 RUN pip install minio
 
-COPY uploader.py .
+COPY upload.py .
 
-CMD ["python", "uploader.py"]
+CMD ["python", "upload.py"]

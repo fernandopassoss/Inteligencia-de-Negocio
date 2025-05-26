@@ -1,30 +1,68 @@
+# docker-compose.yml
 version: '3.8'
 
 services:
   minio:
-    image: minio/minio:latest
-    container_name: minio
+    image: minio/minio:latest # [cite: 7] (ou quay.io/minio/minio:latest)
+    container_name: minio # [cite: 7]
     environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_ROOT_USER: minioadmin # [cite: 7]
+      MINIO_ROOT_PASSWORD: minioadmin # [cite: 7]
     volumes:
-      - minio_data:/data
+      - minio_data:/data # [cite: 7]
     ports:
-      - "9000:9000"
-      - "9001:9001"       #console UI
-    command: server /data --console-address ":9001"
+      - "9000:9000" # [cite: 7]
+      - "9001:9001" # [cite: 7] console UI
+    # Comando corrigido (espaço antes de /data e --console-address)
+    command: server /data --console-address ":9001" # [cite: 7] (corrigido)
+    networks:
+      - datalake_net
+    healthcheck: # Adicionado para melhor controle de dependência
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/minio/health/live || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  generator: # NOVO SERVIÇO
+    build:
+      context: ./generator # Caminho para a pasta do gerador
+      dockerfile: Dockerfile
+    container_name: file_generator
+    volumes:
+      # Volume nomeado para compartilhar o arquivo parquet gerado
+      - generated_parquet_files:/output_data # O script Python salva aqui
+    networks:
+      - datalake_net
+    # Este container executa o script e finaliza.
 
   uploader:
-    build: ./uploader
-    container_name: uploader
-    depends_on:
-      - minio
+    build:
+      context: ./uploader # [cite: 7] (caminho relativo é mais comum)
+      dockerfile: Dockerfile # Assumindo que o Dockerfile está na pasta uploader
+    container_name: uploader # [cite: 7]
+    depends_on: # Define a ordem e condições de inicialização
+      minio:
+        condition: service_healthy # Espera o MinIO estar saudável (healthcheck)
+      generator:
+        condition: service_completed_successfully # Espera o 'generator' terminar com sucesso
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data # [cite: 7] Montagem original para example.txt
+      # Monta o volume compartilhado para ler o arquivo parquet
+      - generated_parquet_files:/input_files # O script uploader.py lerá daqui
     environment:
-      MINIO_ENDPOINT: minio:9000
-      MINIO_ACCESS_KEY: minioadmin
-      MINIO_SECRET_KEY: minioadmin
+      MINIO_ENDPOINT: minio:9000 # [cite: 7]
+      MINIO_ACCESS_KEY: minioadmin # [cite: 7]
+      MINIO_SECRET_KEY: minioadmin # [cite: 7]
+      # Variáveis para o uploader.py modificado pegar o arquivo Parquet:
+      UPLOAD_FILE_PATH: /input_files/one_million_rows.parquet # Caminho DENTRO do container uploader
+      UPLOAD_OBJECT_NAME: one_million_rows.parquet # Nome do arquivo no bucket MinIO
+    networks:
+      - datalake_net
 
 volumes:
-  minio_data:
+  minio_data: {} # [cite: 7] Volume persistente para MinIO
+  generated_parquet_files: {} # NOVO volume para compartilhar o Parquet entre generator e uploader
+
+networks:
+  datalake_net: # Rede para permitir comunicação entre containers pelo nome do serviço
+    driver: bridge

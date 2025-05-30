@@ -1,0 +1,106 @@
+
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio_data:/data 
+    ports:
+      - "9000:9000"
+      - "9001:9001" 
+    command: server /data --console-address ":9001" 
+    healthcheck: 
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: useradmin
+      POSTGRES_PASSWORD: useradmin
+      POSTGRES_DB: meudb
+    volumes:
+      - pg_data:/var/lib/postgresql/data 
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U useradmin -d meudb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api_correios:
+    build:
+      context: ./api_correios/
+      dockerfile: api_correios.dockerfile
+    container_name: api_correios
+    depends_on:
+      minio:
+        condition: service_healthy 
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+
+  leitura_db:
+    build:
+      context: ./leitura_db/
+      dockerfile: leitura_db.dockerfile
+    container_name: leitura_db
+    depends_on:
+      postgres:
+        condition: service_healthy 
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin 
+      DB_HOST: postgres
+      DB_USER: useradmin
+      DB_PASS: useradmin
+      DB_NAME: meudb
+
+  leitura_csv:
+    build:
+      context: ./leitura_csv/
+      dockerfile: leitura_csv.dockerfile
+    container_name: leitura_csv
+    depends_on:
+      minio:
+        condition: service_healthy 
+    volumes:
+    
+
+      - ./csv_data:/data 
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+
+  python_transformer:
+    build:
+      context: ./python_transformer/
+      dockerfile: python_transformer.dockerfile
+    container_name: python_transformer
+    depends_on:
+      minio:
+        condition: service_healthy 
+      api_correios:
+        condition: service_completed_successfully 
+      leitura_csv:
+        condition: service_completed_successfully 
+      leitura_db:
+        condition: service_completed_successfully 
+    environment:
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+
+volumes: 
+  minio_data:
+  pg_data:

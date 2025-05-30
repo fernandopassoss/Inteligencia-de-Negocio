@@ -74,8 +74,6 @@ services:
       minio:
         condition: service_healthy 
     volumes:
-    
-
       - ./csv_data:/data 
     environment:
       MINIO_ENDPOINT: minio:9000

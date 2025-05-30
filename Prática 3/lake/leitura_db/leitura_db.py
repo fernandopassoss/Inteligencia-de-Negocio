@@ -32,8 +32,8 @@ conn = psycopg2.connect(
 
 cur = conn.cursor()
 
-cur.execute("CREATE TABLE IF NOT EXISTS clientes (id SERIAL PRIMARY KEY, nome TEXT, email TEXT);")
-cur.execute("INSERT INTO clientes (nome, email) VALUES ('João', 'joao@exemplo.com') ON CONFLICT (nome) DO NOTHING;") # Adicionado ON CONFLICT para evitar duplicidade
+cur.execute("CREATE TABLE IF NOT EXISTS clientes (id SERIAL PRIMARY KEY, nome TEXT UNIQUE, email TEXT);")
+cur.execute("INSERT INTO clientes (nome, email) VALUES ('João', 'joao@exemplo.com') ON CONFLICT (nome) DO NOTHING;") 
 conn.commit()
 
 cur.execute("SELECT id, nome, email FROM clientes;") 

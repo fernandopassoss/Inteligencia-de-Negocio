@@ -12,7 +12,7 @@ client = Minio(
     endpoint,
     access_key=access_key,
     secret_key=secret_key,
-    secure=False # Use True para HTTPS
+    secure=False
 )
 
 bucket = "raw"

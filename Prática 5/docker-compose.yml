@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  pyspark-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pyspark-demo
+    volumes:
+      - ./output:/app/output
+      - ./data:/app/data
+    environment:
+      - SPARK_MASTER=local[*]
+      - SPARK_DRIVER_MEMORY=2g
+      - SPARK_EXECUTOR_MEMORY=2g
+    ports:
+      - "4040:4040"
+      - "4041:4041"
+    networks:
+      - spark-network
+
+  spark-master:
+    image: bitnami/spark:3.4.1
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT_NUMBER=7077
+      - SPARK_MASTER_WEBUI_PORT_NUMBER=8080
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    networks:
+      - spark-network
+    profiles:
+      - cluster
+
+  spark-worker:
+    image: bitnami/spark:3.4.1
+    container_name: spark-worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_MEMORY=2g
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_WEBUI_PORT_NUMBER=8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+    profiles:
+      - cluster
+
+networks:
+  spark-network:
+    driver: bridge
+
+volumes:
+  spark-data:

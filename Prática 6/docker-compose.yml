@@ -1,0 +1,53 @@
+services:
+  spark-master:
+    image: bitnami/spark:3.3
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    networks:
+      - iot_net
+    volumes:
+      - ./app:/app
+      - ./data_input:/data_input
+
+  spark-worker-1:
+    image: bitnami/spark:3.3
+    container_name: spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - iot_net
+    volumes:
+      - ./data_input:/data_input
+
+  spark-worker-2:
+    image: bitnami/spark:3.3
+    container_name: spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    networks:
+      - iot_net
+    volumes:
+      - ./data_input:/data_input
+
+  python-ingestor:
+    build:
+      context: ./app
+    container_name: python-ingestor
+    volumes:
+      - ./data_input:/data_input
+    networks:
+      - iot_net
+
+networks:
+  iot_net:
+    driver: bridge

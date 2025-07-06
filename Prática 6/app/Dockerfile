@@ -1,10 +1,14 @@
 FROM python:3.10-slim
 
-WORKDIR /app 
+WORKDIR /app
 
-COPY requirements.txt ./ 
-RUN pip install --no-cache-dir -r requirements.txt 
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY coleta.py ./ 
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "coleta.py"] 
+COPY coleta.py .
+
+CMD ["python", "coleta.py"]

@@ -14,11 +14,11 @@ Este projeto foca na integração e análise de dados financeiros e macroeconôm
 
 ## 👥 Equipe
 
-* Alycia Alves Andrade (536593)
-* Anna Iwiny Alves Andrade (540134)
-* Kalil Pires Lima (569449)
-* Luis Fernando Passos (496513)
-* Wildney Kesney Rodrigues de Sousa (535767)
+* Alycia Alves Andrade 
+* Anna Iwiny Alves Andrade
+* Kalil Pires Lima 
+* Luis Fernando Passos
+* Wildney Kesney Rodrigues de Sousa 
 
 ---
 

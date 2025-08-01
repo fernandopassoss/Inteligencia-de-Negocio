@@ -14,9 +14,6 @@ Este projeto foca na integração e análise de dados financeiros e macroeconôm
 
 ## 👥 Equipe
 
-* Alycia Alves Andrade 
-* Anna Iwiny Alves Andrade
-* Kalil Pires Lima 
 * Luis Fernando Passos
 * Wildney Kesney Rodrigues de Sousa 
 

@@ -4,7 +4,7 @@ import time
 from kafka import KafkaProducer
 
 TOKEN_BRAPI = "h5BphdNjnWU21ZAnJSjpDF" 
-TICKERS = "ITUB4,BBDC4" 
+TICKERS = "PETR4" 
 KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092' 
 KAFKA_TOPIC = 'acoes_topic'
 
@@ -21,8 +21,7 @@ except Exception as e:
 
 
 def buscar_dados_de_acoes(tickers_list, token):
-    url = f"https://brapi.dev/api/quote/{tickers_list}"
-    headers={"Authorization": f"Bearer {token}"},
+    url = f"https://brapi.dev/api/quote/{tickers_list}?token={token}"
     print(f"Buscando dados para: {tickers_list}...")
     try:
         response = requests.get(url)
@@ -52,7 +51,5 @@ if __name__ == '__main__':
             
             # Limpa o buffer para garantir o envio de todas as mensagens do loop
             producer.flush() 
-        
-        # Espera 30 segundos antes da próxima busca para não sobrecarregar a API
-        print("\nAguardando 30 segundos para a próxima busca...")
+        print("\nAguardando 60 segundos para a próxima busca...")
         time.sleep(60)

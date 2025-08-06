@@ -1,0 +1,9 @@
+FROM python:3.10
+
+WORKDIR /app
+
+COPY producer.py /app
+
+RUN pip install kafka-python Faker
+
+CMD  ["python", "producer.py"]  

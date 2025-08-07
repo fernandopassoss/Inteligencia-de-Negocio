@@ -46,3 +46,11 @@ services:
     container_name: producer
     depends_on:
       - kafka
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    container_name: consumer
+    depends_on:
+      - kafka
